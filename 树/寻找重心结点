@@ -1,0 +1,65 @@
+
+/*此题P1395，将问题转换成寻找这个课树的重心，先规定1为根节点，在此条件下用g[x]记录x结点下的子结点数目，f[x]记录x结点下最大的子节点数目，然后先dfs一次，填充f[]数组，最后以最大的f[k]作为根节点，在dfs一次可得到答案*/
+#include<stdio.h>
+#include<queue>
+#include<iostream>
+#include<deque>
+#include<cstring>
+#include <fstream>
+#include <queue>
+#include<math.h>
+#define  ll long long
+using namespace std;  
+
+int n, m, x, y,  cnt, head[50001], f[50001], g[50001];
+bool vis[50001];
+struct node
+{
+	int too;
+	int nextt;
+}e[50001<<1];
+void add(int x, int y)
+{
+	e[++cnt].too = y;
+	e[cnt].nextt = head[x];
+	head[x] = cnt;
+}
+void dfs(int tt)
+{
+	vis[tt] = true;
+	for (int i = head[tt]; i; i = e[i].nextt)
+	{
+		if (vis[e[i].too])
+			continue;
+		dfs(e[i].too);
+		g[tt] += g[e[i].too] + 1;
+		f[tt] = max(f[tt], g[e[i].too] + 1);
+	}
+	f[tt] = max(f[tt], n-g[tt] - 1);
+	vis[tt] = 0;
+}
+int main()
+{
+	ios::sync_with_stdio(false);
+	cin >> n;
+	for (int i = 1; i <n; i++)
+	{
+		cin >> x >> y;
+		add(x, y);
+		add(y, x);
+	}
+
+	dfs(1);
+	int k = 0;
+	f[0] = 0xffffff;
+	for (int i = 1; i <= n; i++)
+		if (f[k] > f[i])
+			k = i;
+	cout << k << " ";
+	memset(g, 0, sizeof(g));
+	dfs(k);
+	int ans=0;
+	for (int i = 1; i <= n; i++)
+		ans += g[i];
+	cout << ans;
+}
